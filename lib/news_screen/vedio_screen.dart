@@ -14,25 +14,45 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   VideoPlayerController? videoController;
   ChewieController? chewieController;
+  bool loading = true;
+  bool errorLoading = false;
 
   @override
   void initState() {
     super.initState();
-    videoController = VideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((_) {
-        chewieController = ChewieController(
-          videoPlayerController: videoController!,
-          autoPlay: true,
-          looping: false,
-        );
-        setState(() {});
+    _initializePlayer();
+  }
+
+  void _initializePlayer() async {
+    try {
+      videoController = VideoPlayerController.network(widget.videoUrl);
+      await videoController!.initialize();
+
+      if (!mounted) return;
+
+      chewieController = ChewieController(
+        videoPlayerController: videoController!,
+        autoPlay: true,
+        looping: false,
+      );
+
+      setState(() {
+        loading = false;
       });
+    } catch (e) {
+      print("Error loading video: $e");
+      if (!mounted) return;
+      setState(() {
+        loading = false;
+        errorLoading = true;
+      });
+    }
   }
 
   @override
   void dispose() {
-    videoController?.dispose();
     chewieController?.dispose();
+    videoController?.dispose();
     super.dispose();
   }
 
@@ -41,10 +61,21 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("Watch Video")),
       body: Center(
-        child: chewieController != null &&
-            chewieController!.videoPlayerController.value.isInitialized
-            ? Chewie(controller: chewieController!)
-            : CircularProgressIndicator(),
+        child: loading
+            ? Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 10),
+            Text("Loading video..."),
+          ],
+        )
+            : errorLoading
+            ? Text(
+          "Failed to load video.",
+          style: TextStyle(color: Colors.red),
+        )
+            : Chewie(controller: chewieController!),
       ),
     );
   }
