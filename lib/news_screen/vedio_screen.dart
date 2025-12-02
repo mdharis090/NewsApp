@@ -1,81 +1,78 @@
+// import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+//
+// import 'package:chewie/chewie.dart';
+// import 'package:newsap/news_screen/vedio_controller/video_bloc.dart';
+// import 'package:newsap/news_screen/vedio_controller/video_event.dart';
+// import 'package:newsap/news_screen/vedio_controller/video_state.dart';
+//
+// class VideoPlayerScreen extends StatelessWidget {
+//   final String videoUrl;
+//   VideoPlayerScreen({required this.videoUrl});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocProvider(
+//       create: (_) => VideoBloc()..add(LoadVideo(url: videoUrl)),
+//       child: Scaffold(
+//         appBar: AppBar(title: Text("Watch Video")),
+//         body: BlocBuilder<VideoBloc, VideoState>(
+//           builder: (context, state) {
+//             if (state is VideoLoading) {
+//               return Center(
+//                 child: Column(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     CircularProgressIndicator(),
+//                     SizedBox(height: 10),
+//                     Text("Loading video..."),
+//                   ],
+//                 ),
+//               );
+//             } else if (state is VideoError) {
+//               return Center(
+//                 child: Text(state.message, style: TextStyle(color: Colors.red)),
+//               );
+//             } else if (state is VideoLoaded) {
+//               return Chewie(controller: state.chewieController);
+//             }
+//             return Container();
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:chewie/chewie.dart';
+import 'package:newsap/news_screen/vedio_controller/video_bloc.dart';
+import 'package:newsap/news_screen/vedio_controller/video_event.dart';
+import 'package:newsap/news_screen/vedio_controller/video_state.dart';
 
-class VideoPlayerScreen extends StatefulWidget {
+class VideoPlayerScreen extends StatelessWidget {
   final String videoUrl;
-
   VideoPlayerScreen({required this.videoUrl});
 
   @override
-  _VideoPlayerScreenState createState() => _VideoPlayerScreenState();
-}
-
-class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  VideoPlayerController? videoController;
-  ChewieController? chewieController;
-  bool loading = true;
-  bool errorLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializePlayer();
-  }
-
-  void _initializePlayer() async {
-    try {
-      videoController = VideoPlayerController.network(widget.videoUrl);
-      await videoController!.initialize();
-
-      if (!mounted) return;
-
-      chewieController = ChewieController(
-        videoPlayerController: videoController!,
-        autoPlay: true,
-        looping: false,
-      );
-
-      setState(() {
-        loading = false;
-      });
-    } catch (e) {
-      print("Error loading video: $e");
-      if (!mounted) return;
-      setState(() {
-        loading = false;
-        errorLoading = true;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    chewieController?.dispose();
-    videoController?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Watch Video")),
-      body: Center(
-        child: loading
-            ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 10),
-            Text("Loading video..."),
-          ],
-        )
-            : errorLoading
-            ? Text(
-          "Failed to load video.",
-          style: TextStyle(color: Colors.red),
-        )
-            : Chewie(controller: chewieController!),
+    return BlocProvider(
+      create: (_) => VideoBloc()..add(LoadVideo(url: videoUrl)),
+      child: Scaffold(
+        appBar: AppBar(title: Text("Watch Video")),
+        body: BlocBuilder<VideoBloc, VideoState>(
+          builder: (context, state) {
+            if (state is VideoLoading) {
+              return Center(child: CircularProgressIndicator());
+            } else if (state is VideoError) {
+              return Center(child: Text(state.message, style: TextStyle(color: Colors.red)));
+            } else if (state is VideoLoaded) {
+              return Chewie(controller: state.chewieController);
+            }
+            return Container();
+          },
+        ),
       ),
     );
   }

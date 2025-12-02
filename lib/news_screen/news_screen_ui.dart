@@ -678,23 +678,405 @@
 //     );
 //   }
 // }
+// import 'package:flutter/material.dart';
+// import 'package:newsap/news_api/news_api_screen.dart';
+// import 'package:newsap/news_screen/vedio_screen.dart';
+//
+//
+// class NewsScreen extends StatefulWidget {
+//   @override
+//   _NewsScreenState createState() => _NewsScreenState();
+// }
+//
+// class _NewsScreenState extends State<NewsScreen> {
+//   final NewsService newsService = NewsService();
+//   final TextEditingController searchCtrl = TextEditingController();
+//   List<dynamic> newsList = [];
+//   bool loading = false;
+//
+//   List<String> categories = [
+//     "Top",
+//     "Sports",
+//     "Technology",
+//     "Business",
+//     "Health",
+//     "World",
+//     "Ary news",
+//     "Geo news",
+//     "Hum Tv"
+//   ];
+//
+//   String selectedCategory = "Top";
+//
+//   fetchNews() async {
+//     setState(() => loading = true);
+//
+//     final query = searchCtrl.text.isEmpty ? selectedCategory : searchCtrl.text;
+//
+//     final data = await newsService.fetchNews(query);
+//
+//     setState(() {
+//       newsList = data;
+//       loading = false;
+//     });
+//   }
+//
+//   bool hasVideo(String url) {
+//     return url.contains("youtube.com") ||
+//         url.contains("youtu.be") ||
+//         url.endsWith(".mp4");
+//   }
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchNews();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: Text("GNews App")),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//             // 🔍 SEARCH BAR
+//             Container(
+//               decoration: BoxDecoration(
+//                 color: Colors.grey.shade200,
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//               child: TextField(
+//                 controller: searchCtrl,
+//                 decoration: InputDecoration(
+//                   hintText: "Search latest news...",
+//                   border: InputBorder.none,
+//                   suffixIcon: IconButton(
+//                     icon: Icon(Icons.search),
+//                     onPressed: fetchNews,
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: 15),
+//
+//             // ⭐ CATEGORY CHIPS
+//             SizedBox(
+//               height: 40,
+//               child: ListView.builder(
+//                 scrollDirection: Axis.horizontal,
+//                 itemCount: categories.length,
+//                 itemBuilder: (context, index) {
+//                   final cat = categories[index];
+//                   final isSelected = selectedCategory == cat;
+//
+//                   return Padding(
+//                     padding: const EdgeInsets.only(right: 8),
+//                     child: ChoiceChip(
+//                       label: Text(cat),
+//                       selected: isSelected,
+//                       onSelected: (value) {
+//                         setState(() {
+//                           selectedCategory = cat;
+//                           searchCtrl.clear();
+//                         });
+//                         fetchNews();
+//                       },
+//                       selectedColor: Colors.blue,
+//                       backgroundColor: Colors.grey.shade300,
+//                     ),
+//                   );
+//                 },
+//               ),
+//             ),
+//             SizedBox(height: 15),
+//
+//             // 📃 NEWS LIST
+//             Expanded(
+//               child: loading
+//                   ? Center(child: CircularProgressIndicator())
+//                   : newsList.isEmpty
+//                   ? Center(child: Text("No news found"))
+//                   : ListView.builder(
+//                 itemCount: newsList.length,
+//                 itemBuilder: (context, index) {
+//                   final item = newsList[index];
+//                   final videoArticle = hasVideo(item['url']);
+//
+//                   return GestureDetector(
+//                     onTap: () {
+//                       if (videoArticle) {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (_) => VideoPlayerScreen(
+//                                 videoUrl: item['url']),
+//                           ),
+//                         );
+//                       } else {
+//                         // Non-video article: open in WebView if needed
+//                         // Or just show details in another screen
+//                       }
+//                     },
+//                     child: Card(
+//                       margin: EdgeInsets.only(bottom: 12),
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(15),
+//                       ),
+//                       elevation: 2,
+//                       child: Padding(
+//                         padding: const EdgeInsets.all(12),
+//                         child: Column(
+//                           crossAxisAlignment:
+//                           CrossAxisAlignment.start,
+//                           children: [
+//                             ClipRRect(
+//                               borderRadius: BorderRadius.circular(12),
+//                               child: item['image'] != null
+//                                   ? Stack(
+//                                 children: [
+//                                   Image.network(
+//                                     item['image'],
+//                                     height: 180,
+//                                     width: double.infinity,
+//                                     fit: BoxFit.cover,
+//                                   ),
+//                                   if (videoArticle)
+//                                     Positioned.fill(
+//                                       child: Center(
+//                                         child: Icon(
+//                                           Icons.play_circle_fill,
+//                                           color: Colors.white,
+//                                           size: 60,
+//                                         ),
+//                                       ),
+//                                     ),
+//                                 ],
+//                               )
+//                                   : Container(
+//                                 height: 180,
+//                                 width: double.infinity,
+//                                 color: Colors.grey.shade300,
+//                                 child: Icon(Icons.image),
+//                               ),
+//                             ),
+//                             SizedBox(height: 10),
+//                             Text(
+//                               item['title'] ?? "No Title",
+//                               style: TextStyle(
+//                                 fontSize: 16,
+//                                 fontWeight: FontWeight.bold,
+//                               ),
+//                             ),
+//                             SizedBox(height: 6),
+//                             Text(
+//                               item['description'] ?? "No Description",
+//                               maxLines: 3,
+//                               overflow: TextOverflow.ellipsis,
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                   );
+//                 },
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// // }
+// import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:newsap/news_screen/vedio_screen.dart';
+//
+// import '../news_api/news_api_screen.dart';
+// import 'news_screen_controller/news_bloc.dart';
+// import 'news_screen_controller/news_event.dart';
+// import 'news_screen_controller/news_state.dart';
+//
+//
+// class NewsScreen extends StatelessWidget {
+//   final TextEditingController searchCtrl = TextEditingController();
+//   final List<String> categories = [
+//     "Top","Sports","Technology","Business","Health","World","Ary news","Geo news","Hum Tv"
+//   ];
+//
+//   bool hasVideo(String url) {
+//     return url.contains("youtube.com") || url.contains("youtu.be") || url.endsWith(".mp4");
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocProvider(
+//       create: (_) => NewsBloc(newsService: NewsService())..add(FetchNews(query: "Top")),
+//       child: Scaffold(
+//         appBar: AppBar(title: Text("GNews App")),
+//         body: Padding(
+//           padding: const EdgeInsets.all(16),
+//           child: Column(
+//             children: [
+//               // 🔍 SEARCH BAR
+//               Container(
+//                 decoration: BoxDecoration(
+//                   color: Colors.grey.shade200,
+//                   borderRadius: BorderRadius.circular(12),
+//                 ),
+//                 child: TextField(
+//                   controller: searchCtrl,
+//                   decoration: InputDecoration(
+//                     hintText: "Search latest news...",
+//                     border: InputBorder.none,
+//                     suffixIcon: IconButton(
+//                       icon: Icon(Icons.search),
+//                       onPressed: () {
+//                         final query = searchCtrl.text.isEmpty ? "Top" : searchCtrl.text;
+//                         context.read<NewsBloc>().add(FetchNews(query: query));
+//                       },
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               SizedBox(height: 15),
+//
+//               // ⭐ CATEGORY CHIPS
+//               SizedBox(
+//                 height: 40,
+//                 child: ListView.builder(
+//                   scrollDirection: Axis.horizontal,
+//                   itemCount: categories.length,
+//                   itemBuilder: (context, index) {
+//                     final cat = categories[index];
+//                     return Padding(
+//                       padding: const EdgeInsets.only(right: 8),
+//                       child: ChoiceChip(
+//                         label: Text(cat),
+//                         selected: context.select((NewsBloc bloc) => bloc.currentCategory == cat),
+//                         onSelected: (_) {
+//                           searchCtrl.clear();
+//                           context.read<NewsBloc>().add(ChangeCategory(category: cat));
+//                         },
+//                         selectedColor: Colors.blue,
+//                         backgroundColor: Colors.grey.shade300,
+//                       ),
+//                     );
+//                   },
+//                 ),
+//               ),
+//               SizedBox(height: 15),
+//
+//               // 📃 NEWS LIST
+//               Expanded(
+//                 child: BlocBuilder<NewsBloc, NewsState>(
+//                   builder: (context, state) {
+//                     if (state is NewsLoading) return Center(child: CircularProgressIndicator());
+//                     if (state is NewsError) return Center(child: Text(state.message));
+//                     if (state is NewsLoaded) {
+//                       final newsList = state.articles;
+//                       if (newsList.isEmpty) return Center(child: Text("No news found"));
+//
+//                       return ListView.builder(
+//                         itemCount: newsList.length,
+//                         itemBuilder: (context, index) {
+//                           final item = newsList[index];
+//                           final videoArticle = hasVideo(item['url']);
+//
+//                           return GestureDetector(
+//                             onTap: () {
+//                               if (videoArticle) {
+//                                 Navigator.push(
+//                                   context,
+//                                   MaterialPageRoute(
+//                                     builder: (_) => VideoPlayerScreen(videoUrl: item['url']),
+//                                   ),
+//                                 );
+//                               }
+//                             },
+//                             child: Card(
+//                               margin: EdgeInsets.only(bottom: 12),
+//                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+//                               elevation: 2,
+//                               child: Padding(
+//                                 padding: const EdgeInsets.all(12),
+//                                 child: Column(
+//                                   crossAxisAlignment: CrossAxisAlignment.start,
+//                                   children: [
+//                                     ClipRRect(
+//                                       borderRadius: BorderRadius.circular(12),
+//                                       child: item['image'] != null
+//                                           ? Stack(
+//                                         children: [
+//                                           Image.network(
+//                                             item['image'],
+//                                             height: 180,
+//                                             width: double.infinity,
+//                                             fit: BoxFit.cover,
+//                                           ),
+//                                           if (videoArticle)
+//                                             Positioned.fill(
+//                                               child: Center(
+//                                                 child: Icon(
+//                                                   Icons.play_circle_fill,
+//                                                   color: Colors.white,
+//                                                   size: 60,
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                         ],
+//                                       )
+//                                           : Container(
+//                                         height: 180,
+//                                         width: double.infinity,
+//                                         color: Colors.grey.shade300,
+//                                         child: Icon(Icons.image),
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 10),
+//                                     Text(
+//                                       item['title'] ?? "No Title",
+//                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+//                                     ),
+//                                     SizedBox(height: 6),
+//                                     Text(
+//                                       item['description'] ?? "No Description",
+//                                       maxLines: 3,
+//                                       overflow: TextOverflow.ellipsis,
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                             ),
+//                           );
+//                         },
+//                       );
+//                     }
+//                     return Container();
+//                   },
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 import 'package:flutter/material.dart';
-import 'package:newsap/news_api/news_api_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:newsap/news_screen/vedio_screen.dart';
 
+import 'artical_screen/artical_screen.dart';
+import 'news_screen_controller/news_bloc.dart';
+import 'news_screen_controller/news_event.dart';
+import 'news_screen_controller/news_state.dart';
 
-class NewsScreen extends StatefulWidget {
-  @override
-  _NewsScreenState createState() => _NewsScreenState();
-}
 
-class _NewsScreenState extends State<NewsScreen> {
-  final NewsService newsService = NewsService();
+class NewsScreen extends StatelessWidget {
   final TextEditingController searchCtrl = TextEditingController();
-  List<dynamic> newsList = [];
-  bool loading = false;
-
-  List<String> categories = [
+  final List<String> categories = [
     "Top",
     "Sports",
     "Technology",
@@ -706,31 +1088,8 @@ class _NewsScreenState extends State<NewsScreen> {
     "Hum Tv"
   ];
 
-  String selectedCategory = "Top";
-
-  fetchNews() async {
-    setState(() => loading = true);
-
-    final query = searchCtrl.text.isEmpty ? selectedCategory : searchCtrl.text;
-
-    final data = await newsService.fetchNews(query);
-
-    setState(() {
-      newsList = data;
-      loading = false;
-    });
-  }
-
   bool hasVideo(String url) {
-    return url.contains("youtube.com") ||
-        url.contains("youtu.be") ||
-        url.endsWith(".mp4");
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchNews();
+    return url.contains("youtube.com") || url.contains("youtu.be") || url.endsWith(".mp4");
   }
 
   @override
@@ -741,7 +1100,7 @@ class _NewsScreenState extends State<NewsScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // 🔍 SEARCH BAR
+            // SEARCH BAR
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
@@ -754,137 +1113,151 @@ class _NewsScreenState extends State<NewsScreen> {
                   border: InputBorder.none,
                   suffixIcon: IconButton(
                     icon: Icon(Icons.search),
-                    onPressed: fetchNews,
+                    onPressed: () {
+                      final query = searchCtrl.text.isEmpty ? "Top" : searchCtrl.text;
+                      context.read<NewsBloc>().add(FetchNews(query: query));
+                    },
                   ),
                 ),
               ),
             ),
             SizedBox(height: 15),
 
-            // ⭐ CATEGORY CHIPS
+            // CATEGORY CHIPS
             SizedBox(
               height: 40,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
-                  final cat = categories[index];
-                  final isSelected = selectedCategory == cat;
-
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(cat),
-                      selected: isSelected,
-                      onSelected: (value) {
-                        setState(() {
-                          selectedCategory = cat;
-                          searchCtrl.clear();
-                        });
-                        fetchNews();
-                      },
-                      selectedColor: Colors.blue,
-                      backgroundColor: Colors.grey.shade300,
-                    ),
-                  );
+                  return CategoryChip(category: categories[index]);
                 },
               ),
             ),
             SizedBox(height: 15),
 
-            // 📃 NEWS LIST
+            // NEWS LIST
             Expanded(
-              child: loading
-                  ? Center(child: CircularProgressIndicator())
-                  : newsList.isEmpty
-                  ? Center(child: Text("No news found"))
-                  : ListView.builder(
-                itemCount: newsList.length,
-                itemBuilder: (context, index) {
-                  final item = newsList[index];
-                  final videoArticle = hasVideo(item['url']);
+              child: BlocBuilder<NewsBloc, NewsState>(
+                builder: (context, state) {
+                  if (state is NewsLoading) return Center(child: CircularProgressIndicator());
+                  if (state is NewsError) return Center(child: Text(state.message));
+                  if (state is NewsLoaded) {
+                    final newsList = state.articles;
+                    if (newsList.isEmpty) return Center(child: Text("No news found"));
 
-                  return GestureDetector(
-                    onTap: () {
-                      if (videoArticle) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => VideoPlayerScreen(
-                                videoUrl: item['url']),
+                    return ListView.builder(
+                      itemCount: newsList.length,
+                      itemBuilder: (context, index) {
+                        final item = newsList[index];
+                        final videoArticle = hasVideo(item['url']);
+
+                        return GestureDetector(
+                          onTap: () {
+                            if (videoArticle) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => VideoPlayerScreen(videoUrl: item['url']),
+                                ),
+                              );
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ArticleScreen(article: item),
+                                ),
+                              );
+                            }
+                          },
+                          child: Card(
+                            margin: EdgeInsets.only(bottom: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            elevation: 2,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: item['image'] != null
+                                        ? Stack(
+                                      children: [
+                                        Image.network(
+                                          item['image'],
+                                          height: 180,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        if (videoArticle)
+                                          Positioned.fill(
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.play_circle_fill,
+                                                color: Colors.white,
+                                                size: 60,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    )
+                                        : Container(
+                                      height: 180,
+                                      width: double.infinity,
+                                      color: Colors.grey.shade300,
+                                      child: Icon(Icons.image),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    item['title'] ?? "No Title",
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 6),
+                                  Text(
+                                    item['description'] ?? "No Description",
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         );
-                      } else {
-                        // Non-video article: open in WebView if needed
-                        // Or just show details in another screen
-                      }
-                    },
-                    child: Card(
-                      margin: EdgeInsets.only(bottom: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: item['image'] != null
-                                  ? Stack(
-                                children: [
-                                  Image.network(
-                                    item['image'],
-                                    height: 180,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  if (videoArticle)
-                                    Positioned.fill(
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.play_circle_fill,
-                                          color: Colors.white,
-                                          size: 60,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              )
-                                  : Container(
-                                height: 180,
-                                width: double.infinity,
-                                color: Colors.grey.shade300,
-                                child: Icon(Icons.image),
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              item['title'] ?? "No Title",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              item['description'] ?? "No Description",
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
+                      },
+                    );
+                  }
+                  return Container();
                 },
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// CATEGORY CHIP WIDGET
+class CategoryChip extends StatelessWidget {
+  final String category;
+  CategoryChip({required this.category});
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = context.select((NewsBloc bloc) => bloc.currentCategory == category);
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(category),
+        selected: isSelected,
+        onSelected: (_) {
+          context.read<NewsBloc>().add(ChangeCategory(category: category));
+        },
+        selectedColor: Colors.blue,
+        backgroundColor: Colors.grey.shade300,
       ),
     );
   }
